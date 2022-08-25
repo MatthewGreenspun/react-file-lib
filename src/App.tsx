@@ -27,6 +27,22 @@ function App() {
       metaData: { fileName: "logo512.png" },
     },
     {
+      type: FILE_TYPE.IMAGE,
+      fileData: "test-files/kitchen_img.jpeg",
+      metaData: { fileName: "kitchen_img_refrigerator.jpeg" },
+    },
+    {
+      type: FILE_TYPE.IMAGE,
+      fileData: "test-files/large_img.png",
+      metaData: { fileName: "large_img.png" },
+    },
+    {
+      type: FILE_TYPE.VIDEO,
+      fileData:
+        "https://s3.us-west-2.amazonaws.com/secure.notion-static.com/3e4e2fef-4e29-4fa7-9d15-59bbe23debcd/bandicam_2021-10-19_13-20-14-460.mp4?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIAT73L2G45EIPT3X45%2F20220825%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20220825T001357Z&X-Amz-Expires=86400&X-Amz-Signature=92f24cd060a871788ef82a7c323d6b2d283153ecd8aa77051f52b10b4fff8cdb&X-Amz-SignedHeaders=host&x-id=GetObject",
+      metaData: { fileName: "video_test.mov" },
+    },
+    {
       type: FILE_TYPE.PDF,
       fileData: "test-files/alg2-2019.pdf",
       metaData: { fileName: "alg2-2019.pdf" },
@@ -53,13 +69,13 @@ function App() {
     },
     {
       type: FILE_TYPE.CSV,
-      fileData: "test-files/csv_test.csv",
-      metaData: { fileName: "csv_test.csv" },
+      fileData: "test-files/csv_test2.csv",
+      metaData: { fileName: "csv_test2.csv" },
     },
     {
-      type: FILE_TYPE.IMAGE,
-      fileData: "test-files/kitchen_img.jpeg",
-      metaData: { fileName: "kitchen_img.jpeg" },
+      type: FILE_TYPE.CSV,
+      fileData: "test-files/csv_test.csv",
+      metaData: { fileName: "csv_test.csv" },
     },
     {
       type: FILE_TYPE.TXT,
@@ -82,7 +98,7 @@ function App() {
             open={fileViewerOpen}
             onClose={() => setFileViewerOpen(false)}
           />
-          <Box maxWidth="50%">
+          <Box maxWidth="800px" width="100%" mx="auto">
             <FileList files={files} />
           </Box>
         </div>

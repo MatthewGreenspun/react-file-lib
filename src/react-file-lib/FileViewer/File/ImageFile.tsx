@@ -1,15 +1,17 @@
 import CircularProgress from "@mui/material/CircularProgress";
 import { useEffect, useState } from "react";
-import { useResizeValue, useFetch } from "../../hooks";
+import { useAsync } from "../../hooks";
 import { DisplayFile } from "../../types";
 import styled from "@emotion/styled";
 
 const Image = styled.img<{
-  maxWidth: number;
-  // maxHeight: number;
+  _width: number;
 }>`
-  max-width: ${(props) => props.maxWidth}px;
-  /* max-height: ${(props) => props.height}; */
+  width: min(${(props) => props._width}px, calc(100vw - 200px));
+
+  @media screen and (max-width: 768px) {
+    width: 100vw;
+  }
 `;
 
 interface Props {
@@ -17,29 +19,33 @@ interface Props {
 }
 
 const ImageFile: React.FC<Props> = ({ file }) => {
-  const [showLoading, setShowLoading] = useState(true);
-  const { isLoading, data } = useFetch(file.fileData, {
-    dataType: "blob",
-  });
-  const imageWidth = useResizeValue(() =>
-    window.innerWidth < 768 ? window.innerWidth : window.innerWidth - 300
+  const [imgWidth, setImgWidth] = useState(0);
+  const { isLoading, data } = useAsync(
+    () =>
+      fetch(file.fileData)
+        .then((res) => res.blob())
+        .then((data) => URL.createObjectURL(data)),
+    [file.fileData]
   );
 
   useEffect(() => {
-    setShowLoading(true);
-    if (!isLoading) setShowLoading(false);
-  }, [isLoading, file.metaData.fileName, data]);
+    if (data) {
+      const img = new window.Image();
+      img.src = data.toString();
+      img.onload = () => {
+        setImgWidth(img.width);
+      };
+    }
+  }, [data]);
 
-  console.log(file.metaData.fileName, showLoading);
   return (
     <>
-      {showLoading && <CircularProgress color="info" />}
-      {!showLoading && (
+      {isLoading && <CircularProgress color="info" />}
+      {!isLoading && (
         <Image
           src={isLoading ? "" : (data as string)}
           alt={file.metaData?.alt}
-          maxWidth={imageWidth}
-          // maxHeight={window.innerHeight - 200}
+          _width={imgWidth}
         />
       )}
     </>

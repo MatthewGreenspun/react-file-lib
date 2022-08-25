@@ -7,6 +7,7 @@ import MicrosoftFile from "./MicrosoftFile";
 import TxtFile from "./TxtFile";
 import AudioFile from "./AudioFile";
 import { DisplayFile, FILE_TYPE } from "../../types";
+import VideoFile from "./VideoFile";
 
 const File: React.FC<DisplayFile> = (file) => {
   const { type } = file;
@@ -20,9 +21,10 @@ const File: React.FC<DisplayFile> = (file) => {
       {type === FILE_TYPE.AUDIO && (
         <AudioFile
           file={file}
-          nativeAudio={file.metaData.nativeAudio ?? false}
+          nativeAudio={file.metaData.nativeAudio ?? true}
         />
       )}
+      {type === FILE_TYPE.VIDEO && <VideoFile file={file} />}
     </Box>
   );
 };

@@ -22,10 +22,15 @@ const FileViewer: React.FC<Props> = ({
   fadeTime,
   nativeAudio,
 }) => {
-  const { files: contextFiles, showFileViewer, setShowFileViewer, fileIdx, setFileIdx } =
-    useContext(filesContext);
+  const {
+    files: contextFiles,
+    showFileViewer,
+    setShowFileViewer,
+    fileIdx,
+    setFileIdx,
+  } = useContext(filesContext);
 
-  const files = contextFiles || propsFiles || []
+  const files = contextFiles || propsFiles || [];
 
   return (
     <Fade
@@ -51,6 +56,7 @@ const FileViewer: React.FC<Props> = ({
           height="100%"
           top={0}
           left={0}
+          right={0}
           bottom={0}
           p={2}
           zIndex={1000}
@@ -70,11 +76,7 @@ const FileViewer: React.FC<Props> = ({
                 onClose,
               }}
             />
-            <Box
-              width={Math.max(300, window.innerWidth - 200)}
-              mx="auto"
-              flex={1}
-            >
+            <Box mx="auto" flex={1}>
               <File
                 type={files[fileIdx].type}
                 fileData={files[fileIdx].fileData}

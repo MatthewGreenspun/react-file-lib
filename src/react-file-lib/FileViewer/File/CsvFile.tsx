@@ -20,38 +20,50 @@ const TableHeader = styled.thead`
 
 const TableRow = styled.tr``;
 
-const TableCellStyle = (props: any) =>
-  css`
-    flex: ${props.flex};
-    max-width: ${props.maxWidth};
-  `;
 //TODO: text align right for rtl langs
-const TD = styled.td`
-  ${TableCellStyle};
+const TD = styled.td<{ bgColor?: string }>`
+  background-color: ${(props) => props.bgColor ?? "white"};
+  min-width: 10rem;
   text-align: left;
-  padding-right: 1rem;
-  border-bottom: 1px solid ${grey[300]};
+  padding: 0 0.5rem 0 2px;
+  border: 1px solid ${grey[300]};
   margin: 1rem 0;
 `;
 
 const TableCell: React.FC<{ children: string }> = ({ children }) => {
   return (
     <TD>
-      {children.split(" ").map((value, idx) =>
-        /http/.test(value) ? (
-          <a
-            style={{ color: blue[500] }}
-            href={value}
-            key={idx}
-            target="_blank"
-            rel="noreferrer"
-          >
-            {value}
-          </a>
-        ) : (
-          value
-        )
-      )}
+      <Typography variant="body2">
+        {children
+          .split(" ")
+          .reduce<(string | JSX.Element)[]>((acc, value, idx) => {
+            if (/http/.test(value)) {
+              return [
+                ...acc,
+                <a
+                  style={{ color: blue[500] }}
+                  href={value}
+                  key={idx}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  {value}
+                </a>,
+              ];
+            } else {
+              if (
+                typeof acc[acc.length - 1] === "string" ||
+                typeof acc[acc.length - 1] === "number"
+              ) {
+                return [
+                  ...acc.slice(0, acc.length - 1),
+                  acc[acc.length - 1] + " " + value,
+                ];
+              }
+              return [...acc, value];
+            }
+          }, [])}
+      </Typography>
     </TD>
   );
 };
@@ -64,7 +76,6 @@ const CsvFile: React.FC<Props> = ({ file }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
   const [data, setData] = useState<string[][]>();
-  const [colWidths, setColWidths] = useState<number[]>([]);
 
   useEffect(() => {
     fetch(file.fileData)
@@ -78,26 +89,8 @@ const CsvFile: React.FC<Props> = ({ file }) => {
         });
       });
   }, [file.fileData]);
-  const calculateColWidths = useCallback(() => {
-    if (data) {
-      const widths = Array(data[0].length).fill(0);
-      data.forEach((row) => {
-        row.forEach((value, idx) => {
-          widths[idx] += value.length;
-        });
-      });
-      setColWidths(widths.map((total) => Math.round(total / data.length)));
-    }
-  }, [data]);
 
-  useEffect(() => {
-    window.addEventListener("resize", (e) => calculateColWidths());
-    return () => {
-      window.removeEventListener("resize", (e) => calculateColWidths());
-    };
-  }, [calculateColWidths]);
-
-  if (isLoading) return <CircularProgress color="warning" />;
+  if (isLoading) return <CircularProgress color="info" />;
   if (isError)
     return (
       <Typography variant="h6" color="red">
@@ -106,7 +99,7 @@ const CsvFile: React.FC<Props> = ({ file }) => {
     );
   return (
     <Box
-      maxWidth={window.innerWidth - 200}
+      maxWidth={Math.max(768, window.innerWidth - 200)}
       overflow="auto"
       padding="1rem"
       borderRadius="1rem"
@@ -118,7 +111,9 @@ const CsvFile: React.FC<Props> = ({ file }) => {
           <TableRow>
             {data &&
               data[0].map((columnHeader, idx) => (
-                <TD key={columnHeader}>{columnHeader}</TD>
+                <TD key={idx} bgColor={grey[400]}>
+                  {columnHeader}
+                </TD>
               ))}
           </TableRow>
         </TableHeader>

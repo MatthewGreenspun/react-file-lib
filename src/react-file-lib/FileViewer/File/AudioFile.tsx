@@ -111,7 +111,7 @@ const AudioFile: React.FC<Props> = ({ file, nativeAudio }) => {
         <IconButton onClick={handlePausePressed}>
           {isPaused ? <PlayArrowIcon /> : <PauseIcon />}
         </IconButton>
-        <ControlBox flex={2} smallRev>
+        <ControlBox flex={2} smallRev={true}>
           <Typography variant="body1" marginRight={2}>
             {formatTime(currentTime)}/
             {audioRef.current?.duration

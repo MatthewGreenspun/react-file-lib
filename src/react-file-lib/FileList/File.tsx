@@ -8,6 +8,7 @@ import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
 import VideoFileIcon from "@mui/icons-material/VideoFile";
 import { grey } from "@mui/material/colors";
 import { styled } from "@mui/material/styles";
+import { useRef } from "react";
 
 const FileIcon: React.FC<{ type: FILE_TYPE }> = ({ type }) => {
   if (type === FILE_TYPE.AUDIO)
@@ -28,6 +29,14 @@ const FileBox = styled(Box)`
   }
 `;
 
+const FileName = styled(Typography)`
+  margin-top: 1rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 140px;
+`;
+
 interface Props {
   file: DisplayFile;
 }
@@ -44,13 +53,12 @@ const File: React.FC<Props> = ({ file }) => {
       borderRadius="0.5rem"
       m={1}
       p={1}
+      maxWidth="160px"
     >
       <Box flex={1} display="flex" justifyContent="center" alignItems="center">
         <FileIcon type={file.type} />
       </Box>
-      <Typography variant="body2" sx={{ mt: "1rem" }}>
-        {file.metaData.fileName}
-      </Typography>
+      <FileName variant="body2">{file.metaData.fileName}</FileName>
     </FileBox>
   );
 };

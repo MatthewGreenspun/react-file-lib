@@ -10,8 +10,9 @@ import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
 import { DisplayFile } from "../types";
 import { styled } from "@mui/material/styles";
-import { useContext, useRef } from "react";
+import { useContext, useRef, useCallback } from "react";
 import { filesContext } from "../context/filesContext";
+import { useResizeValue } from "../hooks";
 
 interface Props {
   files: DisplayFile[];
@@ -20,10 +21,31 @@ interface Props {
   onClose: () => void;
   onDelete?: () => void;
   onDownload?: () => void;
-  onCloudDownload?: () => void;
 }
 
-const ButtonsContainer = styled(Box)``;
+const ButtonsContainer = styled(Box)`
+  max-width: 100vw;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  @media screen and (max-width: 425px) {
+    & .file-icon {
+      display: none;
+    }
+  }
+`;
+
+const FileName = styled(Typography)`
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 80vw;
+  @media screen and (max-width: 425px) {
+    max-width: 50vw;
+  }
+`;
 
 const Controls: React.FC<Props> = ({
   files,
@@ -32,22 +54,12 @@ const Controls: React.FC<Props> = ({
   onClose,
   onDelete,
   onDownload,
-  onCloudDownload,
 }) => {
   const buttonsContainerRef = useRef<HTMLDivElement>();
   const { setShowFileViewer } = useContext(filesContext);
   return (
     <>
-      <ButtonsContainer
-        ref={buttonsContainerRef}
-        width="100%"
-        display="flex"
-        justifyContent="space-between"
-        alignItems="center"
-        mb={2}
-        zIndex={10000}
-        maxWidth={window.innerWidth}
-      >
+      <ButtonsContainer ref={buttonsContainerRef} mb={2} zIndex={10000}>
         <Box
           display="flex"
           className="left-btn-box"
@@ -62,18 +74,15 @@ const Controls: React.FC<Props> = ({
           >
             <CloseOutlinedIcon sx={{ color: "white" }} />
           </IconButton>
-          <Box mx={1}>
+          <Box mx={1} className="file-icon">
             <FileIcon />
           </Box>
-          <Typography variant="h6" sx={{ overflowWrap: "break-word" }}>
+          <FileName variant="h6">
             {files[fileIdx].metaData?.fileName ?? files[fileIdx].fileData}
-          </Typography>
+          </FileName>
         </Box>
 
         <Box className="right-btn-box" display="flex" justifyContent="flex-end">
-          <IconButton onClick={onCloudDownload}>
-            <CloudDownloadIcon sx={{ color: "white" }} />
-          </IconButton>
           <IconButton onClick={onDownload}>
             <FileDownloadOutlinedIcon sx={{ color: "white" }} />
           </IconButton>
@@ -83,10 +92,11 @@ const Controls: React.FC<Props> = ({
         </Box>
       </ButtonsContainer>
       <Box
-        width="100%"
         display="flex"
         position="fixed"
         top="50%"
+        left={0}
+        right={0}
         justifyContent="space-between"
         boxSizing="border-box"
         px={4}

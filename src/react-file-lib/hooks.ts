@@ -1,56 +1,36 @@
-import { useState, useEffect, useLayoutEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 
-/**
- *	recalculates value when window size changes
- * @param fn
- * @returns
- */
 export function useResizeValue<T>(fn: () => T): T {
   const [value, setValue] = useState(fn());
   useEffect(() => {
     window.addEventListener("resize", () => setValue(fn()));
     return () => window.removeEventListener("resize", () => setValue(fn()));
-  }, []);
+  }, [fn]);
   return value;
 }
 
-interface Options {
-  dataType: "json" | "arrayBuffer" | "blob";
-}
-
-type Json =
-  | string
-  | number
-  | boolean
-  | null
-  | { [property: string]: Json }
-  | Json[];
-
-export function useFetch(url: string, opts: Options = { dataType: "json" }) {
+export function useAsync<T>(
+  fn: () => Promise<T>,
+  deps: React.DependencyList = []
+) {
   const [isLoading, setIsLoading] = useState(true);
-  const [data, setData] = useState<
-    Blob | Record<string, Json> | ArrayBuffer | string
-  >();
+  const [data, setData] = useState<T>();
   const [error, setError] = useState<Error>();
+  console.log("fetching");
 
-  const makeRequest = useCallback(async () => {
-    try {
-      const res = await fetch(url);
-      // const data = await res[opts.dataType]();
-      const data = await res.blob();
-      const dataUrl = URL.createObjectURL(data);
-      setIsLoading(false);
-      setData(dataUrl);
-      return data;
-    } catch (err: any) {
-      setIsLoading(false);
-      setError(err);
-    }
-  }, [url]);
+  const callbackMemoized = useCallback(() => {
+    setIsLoading(true);
+    setData(undefined);
+    setError(undefined);
+    fn()
+      .then(setData)
+      .catch(setError)
+      .finally(() => setIsLoading(false));
+  }, deps);
 
   useEffect(() => {
-    makeRequest();
-  }, [makeRequest]);
+    callbackMemoized();
+  }, [callbackMemoized]);
 
   return { isLoading, data, error };
 }
